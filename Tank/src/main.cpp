@@ -37,12 +37,17 @@ void loop() {
 
   WiFiClient client = wifiServer.available();
   if (client) {
+    while (!client.connected()) {
+      delay(10);
+      Serial.println("wait connection");
+    }
     while (client.connected()) {
+      Serial.println(client.readString());
       while (client.available() > 0) {
         char c = client.read();
-        Serial.print(c);
+        Serial.print("data : ");
+        Serial.println(c);
       }
-      Serial.println();
       delay(10);
     }
     client.stop();
