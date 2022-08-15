@@ -1,6 +1,6 @@
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 
-// https://www.dfrobot.com/blog-994.html
 WiFiServer wifiServer(2300);
 
 void reconnectIfNeed() {
@@ -32,9 +32,10 @@ void setup() {
   wifiServer.begin();
 }
 
+DynamicJsonDocument doc(1024);
+
 void loop() {
   reconnectIfNeed();
-
   WiFiClient client = wifiServer.available();
   if (client) {
     while (!client.connected()) {
@@ -42,13 +43,9 @@ void loop() {
       Serial.println("wait connection");
     }
     while (client.connected()) {
-      Serial.println(client.readString());
-      while (client.available() > 0) {
-        char c = client.read();
-        Serial.print("data : ");
-        Serial.println(c);
-      }
-      delay(10);
+      deserializeJson(doc, client);
+      Serial.println(doc["s"].as<int16_t>());
+      Serial.println(doc["r"].as<int16_t>());
     }
     client.stop();
     Serial.println(F("Client disconnected"));
