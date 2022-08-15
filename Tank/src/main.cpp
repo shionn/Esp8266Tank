@@ -8,7 +8,7 @@ void reconnectIfNeed() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.print(F("Connecting"));
     while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
+      delay(10);
       Serial.print(WiFi.status());
     }
     Serial.println();
