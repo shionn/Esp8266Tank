@@ -57,12 +57,12 @@ void initNetwork() {
 void setup() {
     Serial.begin(115200);
     initNetwork();
+    // todo Remove
+    radar.angle = 321;
+    radar.dist = 654;
 }
 
-void loop() {
-#ifndef __AP_MODE__
-    reconnectIfNeed();
-#endif
+void updateNetwork() {
     WiFiClient client = wifiServer.available();
     if (client && client.connected()) {
         client.setTimeout(10);
@@ -70,9 +70,14 @@ void loop() {
             Serial.print(move.speed);
             Serial.print(' ');
             Serial.println(move.rot);
-        };
-        radar.angle = 321;
-        radar.dist = 654;
+        }
         client.write((char*)(&radar));
     }
+}
+
+void loop() {
+#ifndef __AP_MODE__
+    reconnectIfNeed();
+#endif
+    updateNetwork();
 }
