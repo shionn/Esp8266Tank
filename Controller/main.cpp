@@ -5,6 +5,15 @@
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 800
 
+struct t_move {
+    int16_t speed;
+    int16_t rot;
+};
+struct t_radar {
+    int16_t angle;
+    int16_t dist;
+};
+
 
 SDL_Window* init() {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
@@ -26,7 +35,7 @@ IPaddress initNetwork() {
         exit(-1);
     }
     IPaddress ip;
-    if (SDLNet_ResolveHost(&ip, "192.168.50.200", 2300) != 0) {
+    if (SDLNet_ResolveHost(&ip, "192, 168, 10, 1", 2300) != 0) {
         fprintf(stderr, "Erreur de resolution d'IP\n");
         exit(1);
     }
@@ -55,16 +64,23 @@ int main(int argc, char const* argv[]) {
                 switch (event.key.keysym.sym) {
                 case SDLK_ESCAPE: quit = true; break;
                 case SDLK_s:
-                    char* buf = "{s:256,r:0}";
+                    t_move packet;
+                    packet.speed = 123;
+                    packet.rot = 456;
                     TCPsocket serveur = SDLNet_TCP_Open(&ip);
+                    SDLNet_TCP_Accept(serveur);
                     if (serveur == NULL) {
                         fprintf(stderr, "Erreur de connexion au serveur : %s\n", SDLNet_GetError());
                     } else {
-                        if (SDLNet_TCP_Send(serveur, buf, sizeof(buf)) < sizeof(buf)) {
+                        if (SDLNet_TCP_Send(serveur, &packet, sizeof(packet)) < sizeof(packet)) {
                             fprintf(stderr, "erreur d'envoie : %s\n", SDLNet_GetError());
                         } else {
-                            int r = SDLNet_TCP_Recv(serveur, NULL, sizeof(NULL));
-                            fprintf(stdout, "send and recv %d\n", r);
+                            t_radar radar;
+                            int r = SDLNet_TCP_Recv(serveur, &radar, sizeof(radar));
+                            fprintf(stdout, "send and recv %d %d\n", radar.angle, radar.dist);
+
+                            // int r = SDLNet_TCP_Recv(serveur, NULL, sizeof(NULL));
+
                         }
                         SDLNet_TCP_Close(serveur);
                     }
