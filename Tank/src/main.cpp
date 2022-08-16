@@ -5,49 +5,48 @@ WiFiServer wifiServer(2300);
 
 void reconnectIfNeed() {
 
-  if (WiFi.status() != WL_CONNECTED) {
-    Serial.print(F("Connecting"));
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(10);
-      Serial.print(WiFi.status());
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.print(F("Connecting"));
+        while (!WiFi.isConnected()) {
+            delay(1000);
+            Serial.print(F("."));
+        }
+        Serial.println();
+        Serial.print(F("IP : "));
+        Serial.print(WiFi.localIP());
+        Serial.print(F("\tEth : "));
+        Serial.println(WiFi.macAddress());
     }
-    Serial.println();
-    Serial.print(F("IP : "));
-    Serial.print(WiFi.localIP());
-    Serial.print(F("\tEth : "));
-    Serial.println(WiFi.macAddress());
-  }
 }
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  WiFi.disconnect();
-  WiFi.setHostname("EspTank");
-  WiFi.setAutoConnect(true);
-  WiFi.setAutoReconnect(true);
-  WiFi.begin(F("AsusHome"), F("aazzeerrttyy"));
+    WiFi.disconnect();
+    WiFi.setHostname("EspTank");
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(F("AsusHome"), F("aazzeerrttyy"));
 
-  reconnectIfNeed();
-  wifiServer.begin();
+    reconnectIfNeed();
+    wifiServer.begin();
 }
 
 DynamicJsonDocument doc(1024);
 
 void loop() {
-  reconnectIfNeed();
-  WiFiClient client = wifiServer.available();
-  if (client) {
-    while (!client.connected()) {
-      delay(10);
-      Serial.println("wait connection");
+    reconnectIfNeed();
+    WiFiClient client = wifiServer.available();
+    if (client && client.connected()) {
+        while (client.available()) {
+            Serial.println((char)client.read());
+        }
+        // deserializeJson(doc, client);
+        // Serial.println(doc["s"].as<int16_t>());
+        // Serial.println(doc["r"].as<int16_t>());
+    } else {
+        Serial.print("n");
+        delay(100);
     }
-    while (client.connected()) {
-      deserializeJson(doc, client);
-      Serial.println(doc["s"].as<int16_t>());
-      Serial.println(doc["r"].as<int16_t>());
-    }
-    client.stop();
-    Serial.println(F("Client disconnected"));
-  }
 }
