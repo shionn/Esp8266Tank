@@ -1,4 +1,3 @@
-#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 
 WiFiServer wifiServer(2300);
@@ -33,7 +32,7 @@ void setup() {
     wifiServer.begin();
 }
 
-DynamicJsonDocument doc(1024);
+WiFiClient client;
 
 void loop() {
     reconnectIfNeed();

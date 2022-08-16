@@ -27,7 +27,6 @@ IPaddress initNetwork() {
     }
     IPaddress ip;
     if (SDLNet_ResolveHost(&ip, "192.168.50.200", 2300) != 0) {
-        // if (SDLNet_ResolveHost(&ip, "192.168.1.107", 2300) != 0) {
         fprintf(stderr, "Erreur de resolution d'IP\n");
         exit(1);
     }
@@ -64,9 +63,10 @@ int main(int argc, char const* argv[]) {
                         if (SDLNet_TCP_Send(serveur, buf, sizeof(buf)) < sizeof(buf)) {
                             fprintf(stderr, "erreur d'envoie : %s\n", SDLNet_GetError());
                         } else {
-                            fprintf(stdout, "send \n");
+                            int r = SDLNet_TCP_Recv(serveur, NULL, sizeof(NULL));
+                            fprintf(stdout, "send and recv %d\n", r);
                         }
-                        // SDLNet_TCP_Close(serveur);
+                        SDLNet_TCP_Close(serveur);
                     }
                     break;
                 }
