@@ -100,7 +100,8 @@ void updateNetwork() {
     if (client && client.connected()) {
         client.setTimeout( 10 );
         if (client.readBytes( (uint8_t*)(&move), sizeof( move ) ) == sizeof( move )) {
-            client.write( (char*)(&radar) );
+            client.write( (uint8_t*)(&radar), sizeof( radar ) );
+            // delayMicroseconds( 10 );
         }
     }
 }
@@ -117,7 +118,7 @@ void updateRadar() {
     delayMicroseconds( 10 );
     digitalWrite( RADAR_TRIGGER_PIN, LOW );
     radar.dist = pulseIn( RADAR_ECHO_PIN, HIGH, RADAR_MEASURE_TIMEOUT );
-    Serial.printf( "radar %d", radar.dist );
+    // Serial.printf( "radar %d", radar.dist );
 }
 
 void updateMotor() {
