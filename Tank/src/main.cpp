@@ -30,7 +30,7 @@ WiFiServer wifiServer( 2300 );
 t_move move;
 t_radar radar;
 Servo servo;
-int16_t radarSpeed = 2;
+int16_t radarSpeed = 1;
 
 #ifndef __AP_MODE__
 void reconnectIfNeed() {
@@ -101,7 +101,6 @@ void updateNetwork() {
         client.setTimeout( 10 );
         if (client.readBytes( (uint8_t*)(&move), sizeof( move ) ) == sizeof( move )) {
             client.write( (uint8_t*)(&radar), sizeof( radar ) );
-            // delayMicroseconds( 10 );
         }
     }
 }
@@ -109,7 +108,6 @@ void updateNetwork() {
 void updateRadar() {
     radar.angle += radarSpeed;
     if (radar.angle >= RADAR_MAX_ANGLE || radar.angle <= RADAR_MIN_ANGLE) {
-        radar.angle = 90;
         radarSpeed = -radarSpeed;
     }
 
